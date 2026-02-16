@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const config = require('../src/config.json');
 
-// Verify the Bash deploy command starts with 'az account set --subscription' (REQ-006).
+// Verify deploy commands start with 'az account set --subscription' (REQ-006).
 
 test('bash-deploy-cmd-contains-subscription-set', async ({ page }) => {
   await page.goto('http://localhost:3000/AKS-Construction');
@@ -14,6 +14,29 @@ test('bash-deploy-cmd-subscription-set-before-group-create', async ({ page }) =>
   await page.goto('http://localhost:3000/AKS-Construction');
 
   const deployCmd = await page.locator('[data-testid="deploy-deploycmd"]').innerText();
+  const subscriptionIdx = deployCmd.indexOf('az account set --subscription');
+  const groupCreateIdx = deployCmd.indexOf('az group create');
+  expect(subscriptionIdx).toBeGreaterThanOrEqual(0);
+  expect(groupCreateIdx).toBeGreaterThan(subscriptionIdx);
+});
+
+test('powershell-deploy-cmd-contains-subscription-set', async ({ page }) => {
+  await page.goto('http://localhost:3000/AKS-Construction');
+
+  // Switch to the PowerShell sub-tab within the Deploy tab
+  await page.getByText('PowerShell', { exact: true }).click();
+
+  const deployCmd = await page.locator('[data-testid="deploy-deployPS"]').innerText();
+  expect(deployCmd).toContain(`az account set --subscription ${config.defaults.deploy.subscription}`);
+});
+
+test('powershell-deploy-cmd-subscription-set-before-group-create', async ({ page }) => {
+  await page.goto('http://localhost:3000/AKS-Construction');
+
+  // Switch to the PowerShell sub-tab within the Deploy tab
+  await page.getByText('PowerShell', { exact: true }).click();
+
+  const deployCmd = await page.locator('[data-testid="deploy-deployPS"]').innerText();
   const subscriptionIdx = deployCmd.indexOf('az account set --subscription');
   const groupCreateIdx = deployCmd.indexOf('az group create');
   expect(subscriptionIdx).toBeGreaterThanOrEqual(0);
