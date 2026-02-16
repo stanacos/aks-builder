@@ -11,7 +11,7 @@ param appGWmaxCount int
 var appgwName = 'agw-${resourceName}'
 var appgwResourceId = resourceId('Microsoft.Network/applicationGateways', '${appgwName}')
 
-resource appgwpip 'Microsoft.Network/publicIPAddresses@2023-04-01' = {
+resource appgwpip 'Microsoft.Network/publicIPAddresses@2025-05-01' = {
   name: 'pip-agw-${resourceName}'
   location: location
   sku: {
@@ -131,7 +131,7 @@ var appGwZones = !empty(availabilityZones) ? availabilityZones : []
 
 // 'identity' is always set until this is fixed:
 // https://github.com/Azure/bicep/issues/387#issuecomment-885671296
-resource appgw 'Microsoft.Network/applicationGateways@2023-04-01' = if (!empty(userAssignedIdentity)) {
+resource appgw 'Microsoft.Network/applicationGateways@2025-05-01' = if (!empty(userAssignedIdentity)) {
   name: appgwName
   location: location
   zones: appGwZones
