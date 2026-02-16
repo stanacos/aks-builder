@@ -120,7 +120,7 @@ var fwmgmt_subnet = {
 }
 
 var routeFwTableName = 'rt-afw-${resourceName}'
-resource vnet_udr 'Microsoft.Network/routeTables@2023-04-01' = if (azureFirewalls) {
+resource vnet_udr 'Microsoft.Network/routeTables@2025-05-01' = if (azureFirewalls) {
   name: routeFwTableName
   location: location
   properties: {
@@ -206,7 +206,7 @@ var subnets = union(
 output debugSubnets array = subnets
 
 var vnetName = 'vnet-${resourceName}'
-resource vnet 'Microsoft.Network/virtualNetworks@2023-04-01' = {
+resource vnet 'Microsoft.Network/virtualNetworks@2025-05-01' = {
   name: vnetName
   location: location
   properties: {
@@ -239,7 +239,7 @@ module aks_vnet_con 'networksubnetrbac.bicep' = if (!empty(aksPrincipleId)) {
 
 /*   --------------------------------------------------------------------------  Private Link for ACR      */
 var privateLinkAcrName = 'pl-acr-${resourceName}'
-resource privateLinkAcr 'Microsoft.Network/privateEndpoints@2023-04-01' = if (!empty(privateLinkAcrId)) {
+resource privateLinkAcr 'Microsoft.Network/privateEndpoints@2025-05-01' = if (!empty(privateLinkAcrId)) {
   name: privateLinkAcrName
   location: location
   properties: {
@@ -261,13 +261,13 @@ resource privateLinkAcr 'Microsoft.Network/privateEndpoints@2023-04-01' = if (!e
   }
 }
 
-resource privateDnsAcr 'Microsoft.Network/privateDnsZones@2020-06-01' = if (!empty(privateLinkAcrId))  {
+resource privateDnsAcr 'Microsoft.Network/privateDnsZones@2024-06-01' = if (!empty(privateLinkAcrId))  {
   name: 'privatelink.azurecr.io'
   location: 'global'
 }
 
 var privateDnsAcrLinkName = 'vnet-dnscr-${resourceName}'
-resource privateDnsAcrLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = if (!empty(privateLinkAcrId))  {
+resource privateDnsAcrLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01' = if (!empty(privateLinkAcrId))  {
   parent: privateDnsAcr
   name: privateDnsAcrLinkName
   location: 'global'
@@ -279,7 +279,7 @@ resource privateDnsAcrLink 'Microsoft.Network/privateDnsZones/virtualNetworkLink
   }
 }
 
-resource privateDnsAcrZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-04-01' = if (!empty(privateLinkAcrId))  {
+resource privateDnsAcrZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2025-05-01' = if (!empty(privateLinkAcrId))  {
   parent: privateLinkAcr
   name: 'default'
   properties: {
@@ -297,7 +297,7 @@ resource privateDnsAcrZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZo
 
 /*   --------------------------------------------------------------------------  Private Link for KeyVault      */
 var privateLinkAkvName = 'pl-akv-${resourceName}'
-resource privateLinkAkv 'Microsoft.Network/privateEndpoints@2023-04-01' = if (!empty(privateLinkAkvId)) {
+resource privateLinkAkv 'Microsoft.Network/privateEndpoints@2025-05-01' = if (!empty(privateLinkAkvId)) {
   name: privateLinkAkvName
   location: location
   properties: {
@@ -319,13 +319,13 @@ resource privateLinkAkv 'Microsoft.Network/privateEndpoints@2023-04-01' = if (!e
   }
 }
 
-resource privateDnsAkv 'Microsoft.Network/privateDnsZones@2020-06-01' = if (!empty(privateLinkAkvId))  {
+resource privateDnsAkv 'Microsoft.Network/privateDnsZones@2024-06-01' = if (!empty(privateLinkAkvId))  {
   name: 'privatelink.vaultcore.azure.net'
   location: 'global'
 }
 
 var privateDnsAkvLinkName = 'vnet-dnscr-${resourceName}'
-resource privateDnsAkvLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = if (!empty(privateLinkAkvId))  {
+resource privateDnsAkvLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01' = if (!empty(privateLinkAkvId))  {
   parent: privateDnsAkv
   name: privateDnsAkvLinkName
   location: 'global'
@@ -337,7 +337,7 @@ resource privateDnsAkvLink 'Microsoft.Network/privateDnsZones/virtualNetworkLink
   }
 }
 
-resource privateDnsAkvZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-04-01' = if (!empty(privateLinkAkvId))  {
+resource privateDnsAkvZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2025-05-01' = if (!empty(privateLinkAkvId))  {
   parent: privateLinkAkv
   name: 'default'
   properties: {
@@ -361,7 +361,7 @@ var publicIpAddressName = 'pip-${bastionHostName}'
 ])
 param bastionSku string = 'Standard'
 
-resource bastionPip 'Microsoft.Network/publicIPAddresses@2023-04-01' = if(bastion) {
+resource bastionPip 'Microsoft.Network/publicIPAddresses@2025-05-01' = if(bastion) {
   name: publicIpAddressName
   location: location
   sku: {
@@ -373,7 +373,7 @@ resource bastionPip 'Microsoft.Network/publicIPAddresses@2023-04-01' = if(bastio
   }
 }
 
-resource bastionHost 'Microsoft.Network/bastionHosts@2023-04-01' = if(bastion) {
+resource bastionHost 'Microsoft.Network/bastionHosts@2025-05-01' = if(bastion) {
   name: bastionHostName
   location: location
   sku: {
@@ -397,7 +397,7 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2023-04-01' = if(bastion) {
   }
 }
 
-resource log 'Microsoft.OperationalInsights/workspaces@2022-10-01' existing = if(networkSecurityGroups && !empty(workspaceName)) {
+resource log 'Microsoft.OperationalInsights/workspaces@2025-07-01' existing = if(networkSecurityGroups && !empty(workspaceName)) {
   name: workspaceName
   scope: resourceGroup(workspaceResourceGroupName)
 }
@@ -505,7 +505,7 @@ module nsgPrivateLinks 'nsg.bicep' = if(privateLinks && networkSecurityGroups) {
   ]
 }
 
-resource natGwIp 'Microsoft.Network/publicIPAddresses@2023-04-01' =  [for i in range(0, natGatewayPublicIps): if(natGateway) {
+resource natGwIp 'Microsoft.Network/publicIPAddresses@2025-05-01' =  [for i in range(0, natGatewayPublicIps): if(natGateway) {
   name: 'pip-${natGwName}-${i+1}'
   location: location
   sku: {
@@ -521,7 +521,7 @@ output natGwIpArr array = [for i in range(0, natGatewayPublicIps): natGateway ? 
 
 var natGwName = 'ng-${resourceName}'
 
-resource natGw 'Microsoft.Network/natGateways@2023-04-01' = if(natGateway) {
+resource natGw 'Microsoft.Network/natGateways@2025-05-01' = if(natGateway) {
   name: natGwName
   location: location
   sku: {
