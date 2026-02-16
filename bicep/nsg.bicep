@@ -243,6 +243,7 @@ param NsgDiagnosticCategories array = [
   'NetworkSecurityGroupRuleCounter'
 ]
 
+#disable-next-line use-recent-api-versions
 resource nsgDiags 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(workspaceResourceId)) {
   name: 'diags-${nsgName}'
   scope: nsg

@@ -51,6 +51,7 @@ resource fwManagementIp_pip 'Microsoft.Network/publicIPAddresses@2025-05-01' = i
   }
 }
 
+#disable-next-line use-recent-api-versions
 resource fwDiags 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(workspaceDiagsId)) {
   scope: fw
   name: 'fwDiags'

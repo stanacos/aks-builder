@@ -55,6 +55,7 @@ resource kv 'Microsoft.KeyVault/vaults@2025-05-01' = {
   }
 }
 
+#disable-next-line use-recent-api-versions
 resource kvDiags 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(logAnalyticsWorkspaceId)) {
   name: 'kvDiags'
   scope: kv

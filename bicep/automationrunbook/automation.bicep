@@ -176,7 +176,7 @@ resource automationJobs 'Microsoft.Automation/automationAccounts/jobSchedules@20
     runbook: {
       name: runbook.name
     }
-    parameters: job.parameters
+    parameters: job.?parameters
   }
   dependsOn: [schedules] //All of the possible schedules
 }]

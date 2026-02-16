@@ -59,7 +59,7 @@ var bastion_baseSubnet = {
     addressPrefix: bastionSubnetAddressPrefix
   }
 }
-var bastion_subnet = bastion && networkSecurityGroups ? union(bastion_baseSubnet, nsgBastion.outputs.nsgSubnetObj) : bastion_baseSubnet
+var bastion_subnet = bastion && networkSecurityGroups ? union(bastion_baseSubnet, nsgBastion!.outputs.nsgSubnetObj) : bastion_baseSubnet
 
 //NatGatewayEgress
 
@@ -72,7 +72,7 @@ var acrpool_baseSubnet = {
     addressPrefix: acrAgentPoolSubnetAddressPrefix
   }
 }
-var acrpool_subnet = privateLinks && networkSecurityGroups ? union(acrpool_baseSubnet, nsgAcrPool.outputs.nsgSubnetObj) : acrpool_baseSubnet
+var acrpool_subnet = privateLinks && networkSecurityGroups ? union(acrpool_baseSubnet, nsgAcrPool!.outputs.nsgSubnetObj) : acrpool_baseSubnet
 
 var private_link_subnet_name = 'privatelinks-sn'
 var private_link_baseSubnet = {
@@ -83,7 +83,7 @@ var private_link_baseSubnet = {
     privateLinkServiceNetworkPolicies: 'Enabled'
   }
 }
-var private_link_subnet = privateLinks && networkSecurityGroups ? union(private_link_baseSubnet, nsgPrivateLinks.outputs.nsgSubnetObj) : private_link_baseSubnet
+var private_link_subnet = privateLinks && networkSecurityGroups ? union(private_link_baseSubnet, nsgPrivateLinks!.outputs.nsgSubnetObj) : private_link_baseSubnet
 
 
 var appgw_subnet_name = 'appgw-sn'
@@ -93,7 +93,7 @@ var appgw_baseSubnet = {
     addressPrefix: vnetAppGatewaySubnetAddressPrefix
   }
 }
-var appgw_subnet = ingressApplicationGateway && networkSecurityGroups ? union(appgw_baseSubnet, nsgAppGw.outputs.nsgSubnetObj) : appgw_baseSubnet
+var appgw_subnet = ingressApplicationGateway && networkSecurityGroups ? union(appgw_baseSubnet, nsgAppGw!.outputs.nsgSubnetObj) : appgw_baseSubnet
 
 var fw_subnet_name = 'AzureFirewallSubnet' // Required by FW
 var fw_subnet = {
@@ -130,7 +130,7 @@ resource vnet_udr 'Microsoft.Network/routeTables@2025-05-01' = if (azureFirewall
         properties: {
           addressPrefix: '0.0.0.0/0'
           nextHopType: 'VirtualAppliance'
-          nextHopIpAddress: azureFirewalls ? calcAzFwIp.outputs.FirewallPrivateIp : null
+          nextHopIpAddress: azureFirewalls ? calcAzFwIp!.outputs.FirewallPrivateIp : null
         }
       }
     ]
@@ -188,8 +188,8 @@ var aks_podSubnet =  {
     }: {})
 }
 
-var aks_subnet = networkSecurityGroups ? union(aks_baseSubnet, nsgAks.outputs.nsgSubnetObj) : aks_baseSubnet
-var aks_finalPodSubnet = networkSecurityGroups ? union(aks_podSubnet, nsgAks.outputs.nsgSubnetObj) : aks_podSubnet
+var aks_subnet = networkSecurityGroups ? union(aks_baseSubnet, nsgAks!.outputs.nsgSubnetObj) : aks_baseSubnet
+var aks_finalPodSubnet = networkSecurityGroups ? union(aks_podSubnet, nsgAks!.outputs.nsgSubnetObj) : aks_podSubnet
 
 
 
@@ -405,7 +405,8 @@ resource log 'Microsoft.OperationalInsights/workspaces@2025-07-01' existing = if
 param CreateNsgFlowLogs bool = false
 
 var flowLogStorageName = take(replace(toLower('stflow${resourceName}${uniqueString(resourceGroup().id, resourceName)}'),'-',''),24)
-resource flowLogStor 'Microsoft.Storage/storageAccounts@2023-01-01' = if(CreateNsgFlowLogs && networkSecurityGroups) {
+resource flowLogStor 'Microsoft.Storage/storageAccounts@2025-01-01' = if(CreateNsgFlowLogs && networkSecurityGroups) {
+  #disable-next-line BCP334
   name: flowLogStorageName
   kind: 'StorageV2'
   sku: {
@@ -423,9 +424,9 @@ module nsgAks 'nsg.bicep' = if(networkSecurityGroups) {
   params: {
     location: location
     resourceName: '${aks_subnet_name}-${resourceName}'
-    workspaceId: !empty(workspaceName) ? log.properties.customerId : ''
-    workspaceRegion:  !empty(workspaceName) ? log.location : ''
-    workspaceResourceId:  !empty(workspaceName) ? log.id : ''
+    workspaceId: !empty(workspaceName) ? log!.properties.customerId : ''
+    workspaceRegion:  !empty(workspaceName) ? log!.location : ''
+    workspaceResourceId:  !empty(workspaceName) ? log!.id : ''
     ruleInAllowInternetHttp: true
     ruleInAllowInternetHttps: true
     ruleInDenySsh: true
@@ -438,9 +439,9 @@ module nsgAcrPool 'nsg.bicep' = if(acrPrivatePool && networkSecurityGroups) {
   params: {
     location: location
     resourceName: '${acrpool_subnet_name}-${resourceName}'
-    workspaceId: !empty(workspaceName) ? log.properties.customerId : ''
-    workspaceRegion:  !empty(workspaceName) ? log.location : ''
-    workspaceResourceId:  !empty(workspaceName) ? log.id : ''
+    workspaceId: !empty(workspaceName) ? log!.properties.customerId : ''
+    workspaceRegion:  !empty(workspaceName) ? log!.location : ''
+    workspaceResourceId:  !empty(workspaceName) ? log!.id : ''
     FlowLogStorageAccountId: CreateNsgFlowLogs ? flowLogStor.id : ''
   }
   dependsOn: [
@@ -453,9 +454,9 @@ module nsgAppGw 'nsg.bicep' = if(ingressApplicationGateway && networkSecurityGro
   params: {
     location: location
     resourceName: '${appgw_subnet_name}-${resourceName}'
-    workspaceId: !empty(workspaceName) ? log.properties.customerId : ''
-    workspaceRegion:  !empty(workspaceName) ? log.location : ''
-    workspaceResourceId:  !empty(workspaceName) ? log.id : ''
+    workspaceId: !empty(workspaceName) ? log!.properties.customerId : ''
+    workspaceRegion:  !empty(workspaceName) ? log!.location : ''
+    workspaceResourceId:  !empty(workspaceName) ? log!.id : ''
     ruleInAllowInternetHttp: ingressApplicationGatewayPublic
     ruleInAllowInternetHttps: ingressApplicationGatewayPublic
     ruleInAllowGwManagement: true
@@ -474,9 +475,9 @@ module nsgBastion 'nsg.bicep' = if(bastion && networkSecurityGroups) {
   params: {
     location: location
     resourceName: '${bastion_subnet_name}-${resourceName}'
-    workspaceId: !empty(workspaceName) ? log.properties.customerId : ''
-    workspaceRegion:  !empty(workspaceName) ? log.location : ''
-    workspaceResourceId:  !empty(workspaceName) ? log.id : ''
+    workspaceId: !empty(workspaceName) ? log!.properties.customerId : ''
+    workspaceRegion:  !empty(workspaceName) ? log!.location : ''
+    workspaceResourceId:  !empty(workspaceName) ? log!.id : ''
     ruleInAllowBastionHostComms: true
     ruleInAllowInternetHttps: true
     ruleInAllowGwManagement: true
@@ -495,9 +496,9 @@ module nsgPrivateLinks 'nsg.bicep' = if(privateLinks && networkSecurityGroups) {
   params: {
     location: location
     resourceName: '${private_link_subnet_name}-${resourceName}'
-    workspaceId: !empty(workspaceName) ? log.properties.customerId : ''
-    workspaceRegion:  !empty(workspaceName) ? log.location : ''
-    workspaceResourceId:  !empty(workspaceName) ? log.id : ''
+    workspaceId: !empty(workspaceName) ? log!.properties.customerId : ''
+    workspaceRegion:  !empty(workspaceName) ? log!.location : ''
+    workspaceResourceId:  !empty(workspaceName) ? log!.id : ''
     FlowLogStorageAccountId: CreateNsgFlowLogs ? flowLogStor.id : ''
   }
   dependsOn: [
@@ -517,7 +518,7 @@ resource natGwIp 'Microsoft.Network/publicIPAddresses@2025-05-01' =  [for i in r
   }
 }]
 
-output natGwIpArr array = [for i in range(0, natGatewayPublicIps): natGateway ? natGwIp[i].properties.ipAddress : null]
+output natGwIpArr array = [for i in range(0, natGatewayPublicIps): natGateway ? natGwIp[i]!.properties.ipAddress : null]
 
 var natGwName = 'ng-${resourceName}'
 
