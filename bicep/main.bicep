@@ -851,7 +851,7 @@ output ApplicationGatewayName string = deployAppGw ? appgw.name : ''
 param dnsPrefix string = '${resourceName}-dns'
 
 @description('Kubernetes Version')
-param kubernetesVersion string = '1.29.7'
+param kubernetesVersion string = '1.34.2'
 
 @description('Enable Azure AD integration on AKS')
 param enable_aad bool = false
@@ -904,16 +904,16 @@ param upgradeChannel string = 'none'
 param osDiskType string = 'Ephemeral'
 
 @description('VM SKU')
-param agentVMSize string = 'Standard_D4ds_v5'
+param agentVMSize string = 'Standard_D4ds_v6'
 
 @description('Disk size in GB')
 param osDiskSizeGB int = 0
 
 @description('The number of agents for the user node pool')
-param agentCount int = 3
+param agentCount int = 1
 
 @description('The maximum number of nodes for the user node pool')
-param agentCountMax int = 0
+param agentCountMax int = 3
 var autoScale = agentCountMax > agentCount
 
 @minLength(3)
@@ -944,14 +944,14 @@ param networkPlugin string = 'azure'
   'Overlay'
 ])
 @description('The network plugin type')
-param networkPluginMode string = ''
+param networkPluginMode string = 'Overlay'
 
 @allowed([
   ''
   'cilium'
 ])
 @description('Use Cilium dataplane (requires azure networkPlugin)')
-param networkDataplane string = ''
+param networkDataplane string = 'cilium'
 
 @allowed([
   ''
@@ -1005,7 +1005,7 @@ param AksPaidSkuForSLA bool = false
 @minLength(9)
 @maxLength(18)
 @description('The address range to use for pods')
-param podCidr string = '10.240.100.0/22'
+param podCidr string = '10.244.0.0/16'
 
 @minLength(9)
 @maxLength(18)
@@ -1061,7 +1061,7 @@ param AutoscaleProfile object = {
   'userDefinedRouting'
 ])
 @description('Outbound traffic type for the egress traffic of your cluster')
-param aksOutboundTrafficType string = 'loadBalancer'
+param aksOutboundTrafficType string = 'natGateway'
 
 @description('Create a new Nat Gateway, applies to custom networking only')
 param createNatGateway bool = false
@@ -1069,12 +1069,12 @@ param createNatGateway bool = false
 @minValue(1)
 @maxValue(16)
 @description('The effective outbound IP resources of the cluster NAT gateway')
-param natGwIpCount int = 2
+param natGwIpCount int = 1
 
 @minValue(4)
 @maxValue(120)
 @description('Outbound flow idle timeout in minutes for NatGw')
-param natGwIdleTimeout int = 30
+param natGwIdleTimeout int = 5
 
 @description('Configures the cluster as an OIDC issuer for use with Workload Identity')
 param oidcIssuer bool = false
@@ -1136,16 +1136,12 @@ var systemPoolPresets = {
     availabilityZones: []
   }
   Standard : {
-    vmSize: 'Standard_D4ds_v5'
-    count: 3
-    minCount: 3
-    maxCount: 5
+    vmSize: 'Standard_D4ds_v6'
+    count: 1
+    minCount: 1
+    maxCount: 3
     enableAutoScaling: true
-    availabilityZones: [
-      '1'
-      '2'
-      '3'
-    ]
+    availabilityZones: []
   }
   HighSpec : {
     vmSize: 'Standard_D8ds_v4'
@@ -1167,7 +1163,7 @@ var systemPoolBase = {
   count: agentCount
   mode: 'System'
   osType: 'Linux'
-  osSku: osSKU=='AzureLinux' ? osSKU : 'Ubuntu'
+  osSku: 'AzureLinux'
   maxPods: 30
   type: 'VirtualMachineScaleSets'
   vnetSubnetID: !empty(aksSubnetId) ? aksSubnetId : null
@@ -1372,7 +1368,7 @@ param osType string = 'Linux'
 
 @allowed(['AzureLinux','Ubuntu','Windows2019','Windows2022'])
 @description('User Node pool OS SKU')
-param osSKU string = 'Ubuntu'
+param osSKU string = 'AzureLinux'
 
 var poolName = osType == 'Linux' ? nodePoolName : take(nodePoolName, 6)
 
