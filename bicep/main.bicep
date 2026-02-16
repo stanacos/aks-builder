@@ -46,12 +46,12 @@ param byoUaiName string = ''
 
 //--- Custom, BYO networking and PrivateApiZones requires AKS User Identity
 var createAksUai = (custom_vnet || !empty(byoAKSSubnetId) || !empty(dnsApiPrivateZoneId) || keyVaultKmsCreateAndPrereqs || !empty(keyVaultKmsByoKeyId)) && empty(byoUaiName)
-resource aksUai 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = if (createAksUai) {
+resource aksUai 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' = if (createAksUai) {
   name: 'id-aks-${resourceName}'
   location: location
 }
 
-resource byoAksUai 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = if (!empty(byoUaiName)) {
+resource byoAksUai 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (!empty(byoUaiName)) {
   name: byoUaiName
 }
 
@@ -283,7 +283,7 @@ var kmsRbacWaitSeconds=30
 @description('This indicates if the deploying user has provided their PrincipalId in order for the key to be created')
 var keyVaultKmsCreateAndPrereqs = keyVaultKmsCreate && !empty(keyVaultKmsOfficerRolePrincipalId) && privateLinks == false
 
-resource kvKmsByo 'Microsoft.KeyVault/vaults@2022-07-01' existing = if(!empty(keyVaultKmsByoName)) {
+resource kvKmsByo 'Microsoft.KeyVault/vaults@2025-05-01' existing = if(!empty(keyVaultKmsByoName)) {
   name: keyVaultKmsByoName
   scope: resourceGroup(keyVaultKmsByoRG)
 }
@@ -410,7 +410,7 @@ param acrUntaggedRetentionPolicy int = 30
 
 var acrName = 'cr${replace(resourceName, '-', '')}${uniqueString(resourceGroup().id, resourceName)}'
 
-resource acr 'Microsoft.ContainerRegistry/registries@2023-07-01' = if (!empty(registries_sku)) {
+resource acr 'Microsoft.ContainerRegistry/registries@2025-11-01' = if (!empty(registries_sku)) {
   name: acrName
   location: location
   sku: {
@@ -614,7 +614,7 @@ var appGWenableWafFirewall = appGWsku=='Standard_v2' ? false : appGWenableFirewa
 // If integrating App Gateway with KeyVault, create a Identity App Gateway will use to access keyvault
 // 'identity' is always created (adding: "|| deployAppGw") until this is fixed:
 // https://github.com/Azure/bicep/issues/387#issuecomment-885671296
-resource appGwIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = if (deployAppGw) {
+resource appGwIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' = if (deployAppGw) {
   name: 'id-appgw-${resourceName}'
   location: location
 }
@@ -622,7 +622,7 @@ resource appGwIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01
 var appgwName = 'agw-${resourceName}'
 var appgwResourceId = deployAppGw ? resourceId('Microsoft.Network/applicationGateways', '${appgwName}') : ''
 
-resource appgwpip 'Microsoft.Network/publicIPAddresses@2023-04-01' = if (deployAppGw) {
+resource appgwpip 'Microsoft.Network/publicIPAddresses@2025-05-01' = if (deployAppGw) {
   name: 'pip-agw-${resourceName}'
   location: location
   sku: {
@@ -761,7 +761,7 @@ var appgwProperties = union({
 } : {})
 
 // 'identity' is always set until this is fixed: https://github.com/Azure/bicep/issues/387#issuecomment-885671296
-resource appgw 'Microsoft.Network/applicationGateways@2023-04-01' = if (deployAppGw) {
+resource appgw 'Microsoft.Network/applicationGateways@2025-05-01' = if (deployAppGw) {
   name: appgwName
   location: location
   zones: !empty(availabilityZones) ? availabilityZones : []
@@ -1337,7 +1337,7 @@ keyVaultKmsCreateAndPrereqs || !empty(keyVaultKmsByoKeyId) ? azureKeyVaultKms : 
 !empty(serviceMeshProfile) ? { serviceMeshProfile: serviceMeshProfileObj } : {}
 )
 
-resource aks 'Microsoft.ContainerService/managedClusters@2024-01-01' = {
+resource aks 'Microsoft.ContainerService/managedClusters@2025-10-01' = {
   name: 'aks-${resourceName}'
   location: location
   properties: aksProperties
@@ -1474,7 +1474,7 @@ resource aks_admin_role_assignment 'Microsoft.Authorization/roleAssignments@2022
 
 param fluxGitOpsAddon bool = false
 
-resource fluxAddon 'Microsoft.KubernetesConfiguration/extensions@2022-11-01' = if(fluxGitOpsAddon) {
+resource fluxAddon 'Microsoft.KubernetesConfiguration/extensions@2024-11-01' = if(fluxGitOpsAddon) {
   name: 'flux'
   scope: aks
   properties: {
@@ -1497,7 +1497,7 @@ param daprAddon bool = false
 @description('Enable high availability (HA) mode for the Dapr control plane')
 param daprAddonHA bool = false
 
-resource daprExtension 'Microsoft.KubernetesConfiguration/extensions@2022-11-01' = if(daprAddon) {
+resource daprExtension 'Microsoft.KubernetesConfiguration/extensions@2024-11-01' = if(daprAddon) {
     name: 'dapr'
     scope: aks
     properties: {
@@ -1555,7 +1555,7 @@ resource AksDiags 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' =  
   }
 }
 
-resource sysLog 'Microsoft.Insights/dataCollectionRules@2022-06-01' = if (createLaw && omsagent && enableSysLog) {
+resource sysLog 'Microsoft.Insights/dataCollectionRules@2024-03-11' = if (createLaw && omsagent && enableSysLog) {
   name: 'MSCI-${location}-${aks.name}'
   location: location
   kind: 'Linux'
@@ -1638,7 +1638,7 @@ resource sysLog 'Microsoft.Insights/dataCollectionRules@2022-06-01' = if (create
   }
 }
 
-resource association 'Microsoft.Insights/dataCollectionRuleAssociations@2022-06-01' = if (createLaw && omsagent && enableSysLog) {
+resource association 'Microsoft.Insights/dataCollectionRuleAssociations@2024-03-11' = if (createLaw && omsagent && enableSysLog) {
   name: '${aks.name}-${aks_law.name}-association'
   scope: aks
   properties: {
@@ -1695,7 +1695,7 @@ var aks_law_name = 'log-${resourceName}'
 
 var createLaw = (omsagent || deployAppGw || azureFirewalls || CreateNetworkSecurityGroups || defenderForContainers)
 
-resource aks_law 'Microsoft.OperationalInsights/workspaces@2022-10-01' = if (createLaw) {
+resource aks_law 'Microsoft.OperationalInsights/workspaces@2025-07-01' = if (createLaw) {
   name: aks_law_name
   location: location
   properties : union({
@@ -1711,7 +1711,7 @@ resource aks_law 'Microsoft.OperationalInsights/workspaces@2022-10-01' = if (cre
 }
 
 
-resource containerLogsV2_Basiclogs 'Microsoft.OperationalInsights/workspaces/tables@2022-10-01' = if(containerLogsV2BasicLogs){
+resource containerLogsV2_Basiclogs 'Microsoft.OperationalInsights/workspaces/tables@2025-07-01' = if(containerLogsV2BasicLogs){
   name: 'ContainerLogV2'
   parent: aks_law
   properties: {
@@ -1744,7 +1744,7 @@ output LogAnalyticsId string = (createLaw) ? aks_law.id : ''
 @description('Create an Event Grid System Topic for AKS events')
 param createEventGrid bool = false
 
-resource eventGrid 'Microsoft.EventGrid/systemTopics@2023-06-01-preview' = if(createEventGrid) {
+resource eventGrid 'Microsoft.EventGrid/systemTopics@2025-02-15' = if(createEventGrid) {
   name: 'evgt-${aks.name}'
   location: location
   identity: {
