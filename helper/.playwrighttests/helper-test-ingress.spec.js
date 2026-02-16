@@ -9,6 +9,6 @@ test('ingress-options-test-lean-preset-no-ingress', async ({ page }) => {
   await page.click('[data-testid="portalnav-Pivot"] > button:nth-child(3)');
 
   // Expect the AppGateway KV integration checkbox to not be visible (no ingress selected)
-  expect (await page.isVisible('[data-testid="addons-ingress-appgwKVIntegration-Checkbox"]')).toBeFalsy()
+  await expect(page.locator('[data-testid="addons-ingress-appgwKVIntegration-Checkbox"]')).not.toBeVisible();
 
 });

@@ -21,10 +21,10 @@ test('export-az-cmd-lab-preset', async ({ page }) => {
   await page.fill('#azResourceGroup', 'Automation-Actions-AksPublishCI')
 
   //Opt out of telemetry
-  await page.waitForSelector('[data-testid="akscTelemetryOpt-Checkbox"]')
-  expect(await page.locator('[data-testid="akscTelemetryOpt-Checkbox"]').isChecked()).toBeTruthy()
+  const telemetryCheckboxLab = page.locator('[data-testid="akscTelemetryOpt-Checkbox"]');
+  await expect(telemetryCheckboxLab).toBeChecked();
   await page.click('[data-testid="akscTelemetryOpt-Checkbox"]' + chk)
-  expect(await page.locator('[data-testid="akscTelemetryOpt-Checkbox"]').isChecked()).toBeFalsy()
+  await expect(telemetryCheckboxLab).not.toBeChecked();
 
   //Save the contents of the az cmd box to file
   const clitextbox = page.locator('[data-testid="deploy-deploycmd"]');
@@ -53,10 +53,10 @@ test('export-az-cmd-securelab-preset', async ({ page }) => {
   await page.fill('#azResourceGroup', 'Automation-Actions-AksPublishCI')
 
   //Opt out of telemetry
-  await page.waitForSelector('[data-testid="akscTelemetryOpt-Checkbox"]')
-  expect(await page.locator('[data-testid="akscTelemetryOpt-Checkbox"]').isChecked()).toBeTruthy()
+  const telemetryCheckboxSecLab = page.locator('[data-testid="akscTelemetryOpt-Checkbox"]');
+  await expect(telemetryCheckboxSecLab).toBeChecked();
   await page.click('[data-testid="akscTelemetryOpt-Checkbox"]' + chk)
-  expect(await page.locator('[data-testid="akscTelemetryOpt-Checkbox"]').isChecked()).toBeFalsy()
+  await expect(telemetryCheckboxSecLab).not.toBeChecked();
 
   //Save the contents of the az cmd box to file
   const clitextbox = page.locator('[data-testid="deploy-deploycmd"]');
