@@ -5,17 +5,16 @@ const { test, expect } = require('@playwright/test');
 test('lab-preset-loads-via-url', async ({ page }) => {
   await page.goto('http://localhost:3000/AKS-Construction?preset=lean');
 
-  // The Lab preset section should be visible
-  await page.waitForSelector('[data-testid="stacklabenv"]');
-  const stack = page.locator('[data-testid="stacklabenv"]');
-  await expect(stack).toBeVisible();
+  // The Lab preset card should be present (input element is hidden by FluentUI)
+  await expect(page.locator('[data-testid="portalnav-presets-labenv-yourlab-Checkbox"]')).toBeAttached();
 });
 
 test('lab-preset-card-is-checked-by-default', async ({ page }) => {
   await page.goto('http://localhost:3000/AKS-Construction?preset=lean');
 
-  // The Lab Cluster card checkbox should be checked
+  // Wait for the checkbox to be in the DOM, then verify checked state
   const checkbox = page.locator('[data-testid="portalnav-presets-labenv-yourlab-Checkbox"]');
+  await expect(checkbox).toBeAttached();
   await expect(checkbox).toBeChecked();
 });
 

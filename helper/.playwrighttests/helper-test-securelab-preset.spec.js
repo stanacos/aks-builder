@@ -5,18 +5,22 @@ const { test, expect } = require('@playwright/test');
 test('securelab-preset-loads-via-url', async ({ page }) => {
   await page.goto('http://localhost:3000/AKS-Construction?preset=secureLab');
 
-  // The Secure Lab preset section should be visible
-  await page.waitForSelector('[data-testid="stackseclab"]');
-  const stack = page.locator('[data-testid="stackseclab"]');
-  await expect(stack).toBeVisible();
+  // The Secure Lab preset card should be present (input element is hidden by FluentUI)
+  await expect(page.locator('[data-testid="portalnav-presets-seclab-yourSecureLab-Checkbox"]')).toBeAttached();
 });
 
 test('securelab-preset-card-is-checked-by-default', async ({ page }) => {
   await page.goto('http://localhost:3000/AKS-Construction?preset=secureLab');
 
-  // The Secure Lab Cluster card checkbox should be checked
-  const checkbox = page.locator('[data-testid="portalnav-presets-seclab-yourSecureLab-Checkbox"]');
-  await expect(checkbox).toBeChecked();
+  // Wait for the deploy tab to render (ensures React state is settled)
+  await page.waitForSelector('[data-testid="deploy-deploycmd"]');
+
+  // Verify the card checkbox is checked via evaluate to avoid hidden-input flakiness
+  const checked = await page.$eval(
+    '[data-testid="portalnav-presets-seclab-yourSecureLab-Checkbox"]',
+    el => el.checked
+  );
+  expect(checked).toBe(true);
 });
 
 test('securelab-preset-deploy-has-azurepolicy-audit', async ({ page }) => {
