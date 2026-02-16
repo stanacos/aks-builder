@@ -1,5 +1,4 @@
 const { test, expect } = require('@playwright/test');
-const { matchers } = require('playwright-expect');
 
 test('azurevote-catswin', async ({ page }) => {
   console.log('http://' + process.env.APPIP);
