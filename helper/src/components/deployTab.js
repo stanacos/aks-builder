@@ -90,6 +90,7 @@ export default function DeployTab({ defaults, updateFn, tabValues, invalidArray,
     ...(net.networkPlugin === 'azure' && {
         ...(net.networkPluginMode !== defaults.net.networkPluginMode && net.networkPluginMode && {networkPluginMode: 'Overlay'}),
         ...(net.vnet_opt === "custom" && (net.networkPluginMode || net.cniDynamicIpAllocation) && defaults.net.podCidr !== net.podCidr && { podCidr: net.podCidr }),
+        ...(net.networkDataplane !== defaults.net.networkDataplane && net.networkDataplane && {networkDataplane: 'cilium'}),
         }),
     ...(net.vnet_opt === "custom" && net.networkPlugin === 'kubenet' && defaults.net.podCidr !== net.podCidr && { podCidr: net.podCidr }),
     ...((net.vnet_opt === "custom" || net.vnet_opt === "byo") && defaults.net.cniDynamicIpAllocation !== net.cniDynamicIpAllocation && { cniDynamicIpAllocation: true }),
@@ -159,9 +160,6 @@ export default function DeployTab({ defaults, updateFn, tabValues, invalidArray,
     ...(defaults.addons.kedaAddon !== addons.kedaAddon && {kedaAddon: addons.kedaAddon }),
     ...(defaults.addons.blobCSIDriver !== addons.blobCSIDriver && {blobCSIDriver: addons.blobCSIDriver }),
     ...(defaults.addons.workloadIdentity !== addons.workloadIdentity && {oidcIssuer: true, workloadIdentity: addons.workloadIdentity }),
-    ...(net.networkPlugin === 'azure' && {
-      ...(net.networkDataplane !== defaults.net.networkDataplane && net.networkDataplane && {networkDataplane: 'cilium'})
-    }),
     ...(urlParams.getAll('feature').includes('defender') && cluster.DefenderForContainers !== defaults.cluster.DefenderForContainers && { DefenderForContainers: cluster.DefenderForContainers }),
     ...(addons.monitor === "aci" && {
        ...(addons.enableSysLog !== defaults.addons.enableSysLog && {enableSysLog: addons.enableSysLog })
