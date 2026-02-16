@@ -52,3 +52,19 @@ test('postdeploy-script-references-correct-certmanager-version', async () => {
   expect(content).toContain('cert_manager.1_17_4.github_https_url');
   expect(content).not.toContain('cert_manager.1_8_2');
 });
+
+test('certmanagerissuer-chart-version-is-0.4.0', async () => {
+  const chartPath = path.resolve(__dirname, '../../postdeploy/helm/certmanagerissuer/Chart.yaml');
+  const content = fs.readFileSync(chartPath, 'utf8');
+
+  expect(content).toContain('version: 0.4.0');
+});
+
+test('certmanagerissuer-chart-appversion-matches-certmanager', async () => {
+  const chartPath = path.resolve(__dirname, '../../postdeploy/helm/certmanagerissuer/Chart.yaml');
+  const content = fs.readFileSync(chartPath, 'utf8');
+
+  // appVersion should track the cert-manager release (without the 'v' prefix)
+  const expectedAppVersion = CERTMANAGER_VERSION.replace(/^v/, '');
+  expect(content).toContain(`appVersion: "${expectedAppVersion}"`);
+});
