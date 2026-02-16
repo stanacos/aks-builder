@@ -1,4 +1,4 @@
-import { nintendoCharacters, generateNintendoClusterName } from './nintendoNames';
+import { nintendoCharacters, generateNintendoClusterName, MAX_CLUSTER_NAME_LENGTH } from './nintendoNames';
 
 describe('nintendoCharacters', () => {
   test('contains at least 35 characters', () => {
@@ -14,6 +14,19 @@ describe('nintendoCharacters', () => {
   test('contains no duplicates', () => {
     const unique = new Set(nintendoCharacters);
     expect(unique.size).toBe(nintendoCharacters.length);
+  });
+
+  test('all character names produce cluster names <= 20 characters', () => {
+    nintendoCharacters.forEach(name => {
+      const clusterName = `${name}-000`;
+      expect(clusterName.length).toBeLessThanOrEqual(MAX_CLUSTER_NAME_LENGTH);
+    });
+  });
+
+  test('longest possible cluster name does not exceed 20 characters', () => {
+    const longestName = nintendoCharacters.reduce((a, b) => a.length > b.length ? a : b);
+    const longestCluster = `${longestName}-999`;
+    expect(longestCluster.length).toBeLessThanOrEqual(MAX_CLUSTER_NAME_LENGTH);
   });
 });
 
@@ -38,6 +51,13 @@ describe('generateNintendoClusterName', () => {
       expect(num).toBeGreaterThanOrEqual(0);
       expect(num).toBeLessThanOrEqual(999);
       expect(digits).toHaveLength(3);
+    }
+  });
+
+  test('generated cluster names never exceed 20 characters', () => {
+    for (let i = 0; i < 100; i++) {
+      const name = generateNintendoClusterName();
+      expect(name.length).toBeLessThanOrEqual(MAX_CLUSTER_NAME_LENGTH);
     }
   });
 
