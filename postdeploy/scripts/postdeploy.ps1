@@ -240,7 +240,7 @@ if ($certEmail)
     kubectl apply -f "https://$($json.cert_manager.{1_8_2}.github_https_url)"
     Start-Sleep 30s # wait for cert-manager webhook to install
 
-    helm upgrade --install letsencrypt-issuer "$($release_version -ne '' ? $release_version : ".")/postdeploy/helm/Az-CertManagerIssuer-0.3.0.tgz" `
+    helm upgrade --install letsencrypt-issuer "$($release_version -ne '' ? $release_version : ".")/postdeploy/helm/Az-CertManagerIssuer-0.4.0.tgz" `
         --set email=${certEmail}  `
         --set ingressClass=${legacyIngressClass}
 }

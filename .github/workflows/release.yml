@@ -136,7 +136,7 @@ jobs:
         - 'postdeploy/scripts/postdeploy.sh'
         - 'postdeploy/scripts/postdeploy.ps1'
         - 'postdeploy/k8smanifests/networkpolicy-deny-all.yml'
-        - 'postdeploy/helm/Az-CertManagerIssuer-0.3.0.tgz'
+        - 'postdeploy/helm/Az-CertManagerIssuer-0.4.0.tgz'
         - 'helper/src/dependencies.json'
 
     name: Add extra release file-artifacts

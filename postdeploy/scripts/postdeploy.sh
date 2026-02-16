@@ -389,7 +389,7 @@ if [ "$certEmail" ]; then
     kubectl apply -f "https://$(get_image_property "cert_manager.1_17_4.github_https_url")"
     sleep 30s # wait for cert-manager webhook to install
 
-    helm upgrade --install letsencrypt-issuer ${release_version:-./postdeploy/helm}/Az-CertManagerIssuer-0.3.0.tgz \
+    helm upgrade --install letsencrypt-issuer ${release_version:-./postdeploy/helm}/Az-CertManagerIssuer-0.4.0.tgz \
         --set email=${certEmail}  \
         --set ingressClass=${legacyIngressClass}
 fi

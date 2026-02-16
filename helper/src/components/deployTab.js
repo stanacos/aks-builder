@@ -269,7 +269,7 @@ export default function DeployTab({ defaults, updateFn, tabValues, invalidArray,
     '# Private cluster, so use command invoke\n' +
     `az aks command invoke -g ${deploy.rg} -n ${aks}  --command "` +
     post_deployBASHcmd.replaceAll('"', '\\"') +
-    `\n"${deploy.selectedTemplate === "local" ? ' --file ./postdeploy/scripts/postdeploy.sh --file ./postdeploy/helm/Az-CertManagerIssuer-0.3.0.tgz --file ./postdeploy/k8smanifests/networkpolicy-deny-all.yml --file ./helper/src/dependencies.json' : ''}`
+    `\n"${deploy.selectedTemplate === "local" ? ' --file ./postdeploy/scripts/postdeploy.sh --file ./postdeploy/helm/Az-CertManagerIssuer-0.4.0.tgz --file ./postdeploy/k8smanifests/networkpolicy-deny-all.yml --file ./helper/src/dependencies.json' : ''}`
 
   const post_deployBASHstr = cluster.apisecurity !== "private" ?
     (deploy.getCredentials || displayPostCmd ?
