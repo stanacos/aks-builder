@@ -1,8 +1,4 @@
 const { test, expect } = require('@playwright/test');
-const { matchers } = require('playwright-expect');
-
-// add custom matchers
-expect.extend(matchers);
 
 const chk = '+ label > .ms-Checkbox-checkbox > .ms-Checkbox-checkmark' //dom hack to get to the checkbox
 const sliderFirstBubbleSelector='[data-testid="cluster-agentCount-slider"] .ms-Slider-line .ms-Slider-thumb:first-child';
@@ -18,15 +14,10 @@ test('scale-can-be-set-to-zero-by-default', async ({ page }) => {
 
   //Scale to zero
   await page.waitForSelector(sliderFirstBubbleSelector);
-  const agentCountSlider = await page.$(sliderFirstBubbleSelector);
   await page.click(sliderFirstBubbleSelector);
   await page.mouse.down();
   await page.mouse.move(-100,0);
   await page.mouse.up();
-  //await page.screenshot({ path: 'alwaysscreengrabs/scale-debug-slider.png', fullPage: true });
-
-  //const agentCountSlideParent = await agentCountSlider.$('xpath=..')
-  //console.log(await agentCountSlideParent.innerHTML());
 
   const agentCountSliderLocator = page.locator(sliderFirstBubbleSelector);
   await expect(agentCountSliderLocator).toHaveAttribute("aria-valuenow", "0");
@@ -35,8 +26,7 @@ test('scale-can-be-set-to-zero-by-default', async ({ page }) => {
   await page.click('[data-testid="portalnav-Pivot"] > button:nth-child(1)')
 
   //Check parameter is absent
-  await page.waitForSelector('[data-testid="deploy-deploycmd"]')
-  const clitextboxrevisted = await page.$('[data-testid="deploy-deploycmd"]')
+  const clitextboxrevisted = page.locator('[data-testid="deploy-deploycmd"]')
   await expect(clitextboxrevisted).toBeVisible()
   await expect(clitextboxrevisted).toContainText('agentCount=0')
 
@@ -54,7 +44,6 @@ test('manual-scale-prevents-autoscale-from-zero', async ({ page }) => {
 
   //Scale to zero
   await page.waitForSelector(sliderFirstBubbleSelector)
-  const agentCountSlider = await page.$(sliderFirstBubbleSelector)
   await page.click(sliderFirstBubbleSelector);
   await page.mouse.down();
   await page.mouse.move(-100,0);
@@ -66,14 +55,12 @@ test('manual-scale-prevents-autoscale-from-zero', async ({ page }) => {
   //Turn off AutoScale
   //Need to select the sibling element because of this choicebox mess
   const manualScaleSelector ='[data-testid="cluster-manual-scale"]  + .ms-ChoiceField-field'
-  await page.waitForSelector(manualScaleSelector);
-  const manualScale =await page.$(manualScaleSelector);
+  const manualScale = page.locator(manualScaleSelector);
   await expect(manualScale).not.toBeChecked();
   await page.click(manualScaleSelector);
   await expect(manualScale).toBeChecked();
 
   //MinScale should have jumped back to 1, and the slider will have become a simple slider
-  await page.waitForSelector(sliderSelector);
   const agentCountSliderLocator2 = page.locator(sliderSelector);
   await expect(agentCountSliderLocator2).toHaveAttribute("aria-valuenow", "1");
 
@@ -81,8 +68,7 @@ test('manual-scale-prevents-autoscale-from-zero', async ({ page }) => {
   await page.click('[data-testid="portalnav-Pivot"] > button:nth-child(1)')
 
   //Check agentCount=1 matches default so is not emitted
-  await page.waitForSelector('[data-testid="deploy-deploycmd"]')
-  const clitextboxrevisted = await page.$('[data-testid="deploy-deploycmd"]')
+  const clitextboxrevisted = page.locator('[data-testid="deploy-deploycmd"]')
   await expect(clitextboxrevisted).toBeVisible()
   await expect(clitextboxrevisted).not.toContainText('agentCount=')
 
@@ -101,7 +87,6 @@ test('no-user-pool-prevents-autoscale-from-zero', async ({ page }) => {
 
   //Scale to zero
   await page.waitForSelector(sliderFirstBubbleSelector)
-  const agentCountSlider = await page.$(sliderFirstBubbleSelector)
   await page.click(sliderFirstBubbleSelector);
   await page.mouse.down();
   await page.mouse.move(-100,0);
@@ -113,14 +98,12 @@ test('no-user-pool-prevents-autoscale-from-zero', async ({ page }) => {
   //No separate system pool
   //Need to select the sibling element
   const sysPoolSelector ='[data-testid="cluster-systempool-none"]  + .ms-ChoiceField-field'
-  await page.waitForSelector(sysPoolSelector);
-  const noSysPool =await page.$(sysPoolSelector);
+  const noSysPool = page.locator(sysPoolSelector);
   await expect(noSysPool).not.toBeChecked();
   await page.click(sysPoolSelector);
   await expect(noSysPool).toBeChecked();
 
   //MinScale should have jumped back to 1, and the slider will have become a simple slider
-  await page.waitForSelector(sliderFirstBubbleSelector);
   const agentCountSliderLocator3 = page.locator(sliderFirstBubbleSelector);
   console.log(await agentCountSliderLocator3.innerHTML());
   await expect(agentCountSliderLocator3).toHaveAttribute("aria-valuenow", "1");
@@ -129,8 +112,7 @@ test('no-user-pool-prevents-autoscale-from-zero', async ({ page }) => {
   await page.click('[data-testid="portalnav-Pivot"] > button:nth-child(1)')
 
   //Check parameter is absent
-  await page.waitForSelector('[data-testid="deploy-deploycmd"]')
-  const clitextboxrevisted = await page.$('[data-testid="deploy-deploycmd"]')
+  const clitextboxrevisted = page.locator('[data-testid="deploy-deploycmd"]')
   await expect(clitextboxrevisted).toBeVisible()
   //console.log(await clitextboxrevisted.textContent());
   // agentCount=1 matches default so is not emitted
