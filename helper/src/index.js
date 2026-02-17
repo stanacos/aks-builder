@@ -10,15 +10,9 @@ import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 
 // Config
 import baseConfig from "./config.json";
-import labConfig from "./configpresets/lab.json"
-import secureLabConfig from "./configpresets/securelab.json"
 
 const configData = {
-  ...baseConfig,
-  presets: {
-    ...labConfig,
-    ...secureLabConfig
-  }
+  ...baseConfig
 };
 
 export const appInsights = new ApplicationInsights({
@@ -35,7 +29,7 @@ mergeStyles({
   ':global(body,html,#root)': {
     margin: 0,
     padding: 0,
-    height: '100vh',
+    minHeight: '100vh',
   },
 });
 

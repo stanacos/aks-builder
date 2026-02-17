@@ -2,9 +2,9 @@ const { test, expect } = require('@playwright/test');
 
 const chk = '+ label > .ms-Checkbox-checkbox > .ms-Checkbox-checkmark' //dom hack to get to the checkbox
 
-test('disablelocalaccounts-not-present-on-lean-preset', async ({ page }) => {
+test('disablelocalaccounts-not-present-by-default', async ({ page }) => {
 
-  // The lean preset inherits enable_aad=true from config.json but does not set AksDisableLocalAccounts
+  // Config.json defaults have enable_aad=true and enableAzureRBAC=true but not AksDisableLocalAccounts
   await page.goto('http://localhost:3000/AKS-Construction');
 
   //Check AksDisableLocalAccounts parameter is absent
@@ -14,12 +14,12 @@ test('disablelocalaccounts-not-present-on-lean-preset', async ({ page }) => {
 
 });
 
-test('disablelocalaccounts-toggle-on-securelab-preset', async ({ page }) => {
+test('disablelocalaccounts-toggle-on-aad-rbac-config', async ({ page }) => {
 
-  // The secureLab preset enables AAD with Azure RBAC
-  await page.goto('http://localhost:3000/AKS-Construction?preset=secureLab');
+  // Config.json defaults already enable AAD with Azure RBAC
+  await page.goto('http://localhost:3000/AKS-Construction');
 
-  //Check AAD parameter is present
+  //Check AAD parameter is present (enable_aad=true differs from falsy comparison in deployTab)
   const clitextbox = page.locator('[data-testid="deploy-deploycmd"]')
   await expect(clitextbox).toBeVisible()
   await expect(clitextbox).toContainText('enable_aad=true')
@@ -28,7 +28,7 @@ test('disablelocalaccounts-toggle-on-securelab-preset', async ({ page }) => {
   // Click the 2nd Tab in the portal Navigation Pivot (cluster details)
   await page.click('[data-testid="portalnav-Pivot"] > button:nth-child(2)')
 
-  //Inspect the local accounts checkbox, make sure its unchecked (secureLab doesn't set it)
+  //Inspect the local accounts checkbox, make sure its unchecked (default doesn't set it)
   const checkbox2 = page.locator('[data-testid="cluster-localaccounts-Checkbox"]')
   await expect(checkbox2).not.toBeChecked();
   await expect(checkbox2).toBeVisible();

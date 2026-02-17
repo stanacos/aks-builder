@@ -6,7 +6,7 @@ const sliderSelector='[data-testid="cluster-agentCount-slider"]';
 
 test('scale-can-be-set-to-zero-by-default', async ({ page }) => {
 
-  // Use cluster.maxCount param to widen slider range (config.json default maxCount=3 overlaps with preset agentCount=3)
+  // Use cluster.maxCount param to widen slider range (config.json default maxCount=3 overlaps with agentCount=1)
   await page.goto('http://localhost:3000/AKS-Construction?cluster.maxCount=20');
 
   // Click the 2nd Tab in the portal Navigation Pivot (cluster details)
@@ -36,7 +36,7 @@ test('manual-scale-prevents-autoscale-from-zero', async ({ page }) => {
 
   const chk = '+ label > .ms-Checkbox-checkbox > .ms-Checkbox-checkmark' //dom hack to get to the checkbox
 
-  // Use cluster.maxCount param to widen slider range (config.json default maxCount=3 overlaps with preset agentCount=3)
+  // Use cluster.maxCount param to widen slider range (config.json default maxCount=3 overlaps with agentCount=1)
   await page.goto('http://localhost:3000/AKS-Construction?cluster.maxCount=20');
 
   // Click the 2nd Tab in the portal Navigation Pivot (cluster details)
@@ -79,7 +79,7 @@ test('no-user-pool-prevents-autoscale-from-zero', async ({ page }) => {
 
   const chk = '+ label > .ms-Checkbox-checkbox > .ms-Checkbox-checkmark' //dom hack to get to the checkbox
 
-  // Use cluster.maxCount param to widen slider range (config.json default maxCount=3 overlaps with preset agentCount=3)
+  // Use cluster.maxCount param to widen slider range (config.json default maxCount=3 overlaps with agentCount=1)
   await page.goto('http://localhost:3000/AKS-Construction?cluster.maxCount=20');
 
   // Click the 2nd Tab in the portal Navigation Pivot (cluster details)

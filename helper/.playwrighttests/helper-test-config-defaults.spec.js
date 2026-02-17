@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 
 // Tests verify config.json defaults match Bicep parameter defaults (REQ-003).
-// Uses the lean preset (default) which has minimal overrides on networking fields.
+// Uses the base URL which loads config.json defaults directly.
 
 test('config-default-kubernetesVersion', async ({ page }) => {
   await page.goto('http://localhost:3000/AKS-Construction');
@@ -28,7 +28,7 @@ test('config-default-osSKU-is-AzureLinux', async ({ page }) => {
 });
 
 test('config-default-networkPluginMode-is-overlay', async ({ page }) => {
-  // The lean preset does not override networking defaults, so config.json defaults apply
+  // Config.json defaults have networkPluginMode=true (Overlay)
   await page.goto('http://localhost:3000/AKS-Construction');
 
   // Click deploy tab
@@ -41,7 +41,7 @@ test('config-default-networkPluginMode-is-overlay', async ({ page }) => {
 });
 
 test('config-default-networkDataplane-is-cilium', async ({ page }) => {
-  // The lean preset does not override networking defaults, so config.json defaults apply
+  // Config.json defaults have networkDataplane=true (cilium)
   await page.goto('http://localhost:3000/AKS-Construction');
 
   // Click deploy tab
@@ -54,7 +54,7 @@ test('config-default-networkDataplane-is-cilium', async ({ page }) => {
 });
 
 test('config-default-natGw-values-match-bicep', async ({ page }) => {
-  // The lean preset does not override egress type, so config.json default (natGateway) applies
+  // Config.json defaults have aksOutboundTrafficType=natGateway
   await page.goto('http://localhost:3000/AKS-Construction');
 
   // Click the network tab (4th tab)

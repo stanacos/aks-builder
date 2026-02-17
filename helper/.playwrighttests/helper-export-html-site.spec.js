@@ -5,9 +5,8 @@ test('localsite', async ({ page }) => {
 
   await page.goto('http://localhost:3000/AKS-Construction');
 
-  //Wait for the preset section stack to render
-  const stacklabenv='[data-testid="stacklabenv"]';
-  await page.waitForSelector(stacklabenv)
+  //Wait for the main content to render
+  await page.waitForSelector('#mainContent')
 
   //Save the contents of the page to file
   const pageHtml = await page.content();

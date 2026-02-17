@@ -4,7 +4,6 @@ import {  Checkbox, Pivot, PivotItem, Image, TextField, Link, Separator, Dropdow
 
 import { CodeBlock, adv_stackstyle, getError } from './common'
 import dependencies from "../dependencies.json";
-import { Presets } from './presets';
 import locations from '../locations.json';
 
 export default function DeployTab({ defaults, updateFn, tabValues, invalidArray, invalidTabs, urlParams, featureFlag }) {
@@ -75,7 +74,7 @@ export default function DeployTab({ defaults, updateFn, tabValues, invalidArray,
         ...(defaults.net.privateLinkSubnetAddressPrefix !== net.privateLinkSubnetAddressPrefix && {privateLinkSubnetAddressPrefix: net.privateLinkSubnetAddressPrefix}),
     }),
     ...(cluster.SystemPoolType !== "none" && net.enableNodePublicIP !== defaults.net.enableNodePublicIP && {enableNodePublicIP: net.enableNodePublicIP }),
-    ...(deploy.enableTelemetry !== defaults.deploy.enableTelemetry && {enableTelemetry: deploy.enableTelemetry }),
+    ...(deploy.enableTelemetry !== true && {enableTelemetry: deploy.enableTelemetry }),
     ...(addons.monitor === "aci" && {
         omsagent: true, retentionInDays: addons.retentionInDays,
         ...(addons.containerLogsV2BasicLogs && { containerLogsV2BasicLogs: addons.containerLogsV2BasicLogs}),
@@ -96,7 +95,7 @@ export default function DeployTab({ defaults, updateFn, tabValues, invalidArray,
     ...((net.vnet_opt === "custom" || net.vnet_opt === "byo") && defaults.net.cniDynamicIpAllocation !== net.cniDynamicIpAllocation && { cniDynamicIpAllocation: true }),
     ...(cluster.availabilityZones === "yes" && { availabilityZones: ['1', '2', '3'] }),
     ...(cluster.apisecurity === "whitelist" && deploy.clusterIPWhitelist && apiips_array.length > 0 && { authorizedIPRanges: apiips_array }),
-    ...(defaults.net.maxPods !== net.maxPods && { maxPods: net.maxPods }),
+    ...(net.maxPods !== 30 && { maxPods: net.maxPods }),
     ...(cluster.apisecurity === "private" && { enablePrivateCluster: true }),
     ...(cluster.apisecurity === "private" && cluster.apisecurity === "private" && defaults.cluster.privateClusterDnsMethod !== cluster.privateClusterDnsMethod && { privateClusterDnsMethod: cluster.privateClusterDnsMethod }),
     ...(cluster.apisecurity === "private" && cluster.apisecurity === "private" && cluster.privateClusterDnsMethod === 'privateDnsZone' && { dnsApiPrivateZoneId: cluster.dnsApiPrivateZoneId }),
@@ -137,11 +136,11 @@ export default function DeployTab({ defaults, updateFn, tabValues, invalidArray,
     ...(addons.daprAddon !== defaults.addons.daprAddon && { daprAddon: addons.daprAddon }),
     ...(addons.daprAddonHA !== defaults.addons.daprAddonHA && { daprAddonHA: addons.daprAddonHA }),
     ...(addons.sgxPlugin !== defaults.addons.sgxPlugin && { sgxPlugin: addons.sgxPlugin }),
-    ...(addons.automationAccountScheduledStartStop !== defaults.addons.automationAccountScheduledStartStop && {
-      ...({automationAccountScheduledStartStop: addons.automationAccountScheduledStartStop}),
-      ...(addons.automationTimeZone != defaults.addons.automationTimeZone && {automationTimeZone: addons.automationTimeZone}),
-      ...(addons.automationStartHour != defaults.addons.automationStartHour && {automationStartHour: addons.automationStartHour}),
-      ...(addons.automationStopHour != defaults.addons.automationStopHour && {automationStopHour: addons.automationStopHour}),
+    ...(addons.automationAccountScheduledStartStop !== '' && {
+      automationAccountScheduledStartStop: addons.automationAccountScheduledStartStop,
+      automationTimeZone: addons.automationTimeZone,
+      automationStartHour: addons.automationStartHour,
+      automationStopHour: addons.automationStopHour,
     })
   }
 
@@ -157,9 +156,9 @@ export default function DeployTab({ defaults, updateFn, tabValues, invalidArray,
     ...(addons.ingress === "warNginx" && {
       ...(addons.ingress !== defaults.addons.ingress && {warIngressNginx: true})
     }),
-    ...(defaults.addons.kedaAddon !== addons.kedaAddon && {kedaAddon: addons.kedaAddon }),
-    ...(defaults.addons.blobCSIDriver !== addons.blobCSIDriver && {blobCSIDriver: addons.blobCSIDriver }),
-    ...(defaults.addons.workloadIdentity !== addons.workloadIdentity && {oidcIssuer: true, workloadIdentity: addons.workloadIdentity }),
+    ...(addons.kedaAddon !== false && {kedaAddon: addons.kedaAddon }),
+    ...(addons.blobCSIDriver !== false && {blobCSIDriver: addons.blobCSIDriver }),
+    ...(addons.workloadIdentity !== false && {oidcIssuer: true, workloadIdentity: addons.workloadIdentity }),
     ...(urlParams.getAll('feature').includes('defender') && cluster.DefenderForContainers !== defaults.cluster.DefenderForContainers && { DefenderForContainers: cluster.DefenderForContainers }),
     ...(addons.monitor === "aci" && {
        ...(addons.enableSysLog !== defaults.addons.enableSysLog && {enableSysLog: addons.enableSysLog })
@@ -483,17 +482,6 @@ az role assignment create --role "Managed Identity Operator" --assignee-principa
 
       <Separator styles={{ root: { marginTop: '30px !important' } }}><div style={{ display: "flex", alignItems: 'center', }}><b style={{ marginRight: '10px' }}>Deploy Cluster</b><Image src="./bicep.png" alt="Built with bicep" /> <p style={{ marginLeft: '10px' }}>powered by Bicep</p></div> </Separator>
 
-      {(Object.keys(preview_params).length > 0 || Object.keys(preview_post_params).length > 0) &&
-        <MessageBar messageBarType={MessageBarType.severeWarning}>
-          <Text variant={'mediumPlus'} >Your deployment contains <b>Preview Features</b> which may require subscription registration and have Azure Region limitations. Please ensure you have registered for these previews, and have installed the <b>'az extension add --name aks-preview'</b> before running the relevant scripts.<br />Preview Features you have selected: <b>{Object.keys(Object.assign(preview_params,preview_post_params)).join(', ')}</b>.</Text>
-          <Checkbox
-            styles={{ root: { marginTop: "10px" } }}
-            label='Include preview features in deployment'
-            checked={!deploy.disablePreviews}
-            onChange={(ev, checked) => updateFn("disablePreviews", !checked)} />
-        </MessageBar>
-
-      }
 
 
       <Pivot selectedKey={deploy.deployItemKey}  onLinkClick={({props}) => updateFn('deployItemKey', props.itemKey)}>

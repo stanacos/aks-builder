@@ -1,16 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
-import { CommandBarButton, Image, ThemeProvider, Link, Toggle, TooltipHost, Pivot, PivotItem, Icon, Separator, Stack, Text, ChoiceGroup, Modal, IconButton } from '@fluentui/react';
+import { Image, ThemeProvider, Link, Toggle, TooltipHost, Pivot, PivotItem, Icon, Stack, Text, Modal, IconButton } from '@fluentui/react';
 import { AzureThemeLight, AzureThemeDark } from '@fluentui/azure-themes';
 import { mergeStyles, mergeStyleSets } from '@fluentui/merge-styles';
-
-import { Presets, SeparatorStyle } from './presets'
 
 import NetworkTab from './networkTab'
 import AddonsTab from './addonsTab'
 import ClusterTab, { VMs } from './clusterTab'
 import DeployTab from './deployTab'
-import AppsTab from './appsTab'
 
 import { appInsights } from '../index.js'
 import { generateNintendoClusterName } from '../nintendoNames'
@@ -36,8 +33,7 @@ function useAITracking(componentName, key) {
 
 const titleClass = mergeStyleSets({ "display": "inline-block", "marginLeft": "10px", "verticalAlign": "top" })
 
-function Header({ presets, setPresets, selectedPreset, featureFlag }) {
-
+function Header({ featureFlag }) {
 
   return (
     <nav role="menubar">
@@ -53,48 +49,8 @@ function Header({ presets, setPresets, selectedPreset, featureFlag }) {
 
         <Text variant={'mediumPlus'} className={titleClass} style={{ "marginTop": "12px" }}>Docs and CI/CD samples are in the <a href="https://github.com/Azure/AKS-Construction" target="_blank" rel="noopener noreferrer">GitHub Repository</a> and at <a href="https://learn.microsoft.com/azure/cloud-adoption-framework/scenarios/app-platform/aks/landing-zone-accelerator" target="_blank" rel="noopener noreferrer">AKS Landing Zone Accelerator</a></Text>
 
-        <div style={{whiteSpace: "nowrap"}}>
-
-          <CommandBarButton aria-label='Preset scenario' iconProps={{ iconName: presets[selectedPreset].icon }} menuProps={{
-            items: Object.keys(presets).map(p => {
-              return {
-                key: p,
-                text: presets[p].title,
-                disabled: presets[p].disabled,
-                iconProps: { iconName: presets[p].icon },
-                onClick: () => setPresets(p)
-              }
-            })
-
-          }} text={presets[selectedPreset].title} disabled={false} checked={true}
-            styles={{ root: { "vertical-align": "top", padding: "11px 12px 13px", border: "2px solid transparent", background: "transparent" }, label: { color: "#0067b8", fontWeight: "600", fontSize: "15px", lineHeight: "1.3" } }} />
-
-
-        </div>
       </div>
     </nav>
-  )
-}
-
-function Header2({ presets, setPresets, selectedPreset, featureFlag }) {
-  return (
-    <Stack horizontal tokens={{ childrenGap: 10 }}>
-      <img id="aksLogo" src="aks.svg" alt="Kubernetes Service" style={{}}></img>
-      <Stack tokens={{ padding: 10, maxWidth: 700 }} className="intro">
-        <Text variant="xLarge">AKS Construction helper</Text>
-        <Text variant="large" styles={{ root: { marginBottom: '6px' } }}>Generate Azure deployment assets by providing your requirements to quickly create a full operational environment from best practice guidance.</Text>
-        <Text variant="medium" >Documentation and CI/CD samples are in the <a href="https://github.com/Azure/AKS-Construction" target="_blank" rel="noopener noreferrer">GitHub Repository</a></Text>
-      </Stack>
-      <Stack grow={1} tokens={{ padding: 10 }} >
-
-        <ChoiceGroup
-          defaultSelectedKey={selectedPreset}
-          options={Object.keys(presets).map(p => { return { key: p, text: presets[p].title, disabled: presets[p].disabled, iconProps: { iconName: presets[p].icon } } })}
-          onChange={(ev, { key }) => setPresets(key)}
-        >
-        </ChoiceGroup>
-      </Stack>
-    </Stack>
   )
 }
 
@@ -108,16 +64,13 @@ function Header2({ presets, setPresets, selectedPreset, featureFlag }) {
 export default function PortalNav({ config }) {
   console.log(`PortalNav: ${JSON.stringify(Object.keys(config))}`)
 
-  const { tabLabels, defaults, presets } = config
+  const { tabLabels, defaults } = config
   const [pivotkey, setPivotkey] = useState(Object.keys(tabLabels)[0])
   useAITracking("PortalNav", tabLabels[pivotkey])
   const [urlParams, setUrlParams] = useState(new URLSearchParams(window.location.search))
   const [invalidArray, setInvalidArray] = useState(() => Object.keys(defaults).reduce((a, c) => { return { ...a, [c]: [] } }, {}))
-  // The selected cards within the sections for the chosen preset, for example { "ops": "normal", "secure": "high" }
-  const [selected, setSelected] = useState(initSelected(urlParams.get('preset') || 'lean'))
-  useAITracking("PageNav", selected.preset)
   // The tabValues, for example { "deploy": { "clusterName": "az234"}}
-  const [tabValues, setTabValues] = useState(initTabValues(selected, defaults, true))
+  const [tabValues, setTabValues] = useState(initTabValues(defaults, true))
   // Field Selections - Used to keep track of the last FieldSelections monitored by App Insights to prevent logging the same entry continuously
   const [lastAIUpdated, setLastAIUpdated] = useState ({tab: null, field: null})
   const [show, setShow] = useState(false)
@@ -129,24 +82,8 @@ export default function PortalNav({ config }) {
     setPreviewLink(previewLink)
   };
 
-  function initSelected (currentPreset) {
-    return {
-      preset: currentPreset,
-      sections: presets[currentPreset].sections,
-      values: presets[currentPreset].sections.reduce((a, s) => {
-        return { ...a, [s.key]: urlParams.has(s.key) ? urlParams.get(s.key) : s.cards.find(c => c.default).key }
-      }, {})
-    }
-  }
-
-
-  const {description, icon } = presets[selected.preset]
-
-  function initTabValues (selected, baseTabValues, resetDynamic = false)  {
-        // Apply selected presets to tab values
-    var tabApplySections = Object.keys(selected.values).reduce((acc, curr) =>
-      updateTabValues(acc, selected.sections, curr, selected.values[curr])
-      , baseTabValues)
+  function initTabValues (baseTabValues, resetDynamic = false)  {
+    var tabApplySections = baseTabValues
 
     if (resetDynamic) {
       const clusterName = generateNintendoClusterName()
@@ -179,46 +116,6 @@ export default function PortalNav({ config }) {
     return tabApplySections
   }
 
-
-  function updateTabValues(currenttabValues, sections, sectionKey, cardKey) {
-    //console.log(`updateTabValues`)
-    const card_values = sections.find(s => s.key === sectionKey).cards.find(c => c.key === cardKey).values
-    //console.log(`updateTabValues: sectionKey=${sectionKey} cardKey=${cardKey}, setting tabs ${JSON.stringify(Object.keys(card_values))}`)
-    return Object.keys(card_values).reduce((acc, curr) => {
-      return {
-        ...acc,
-        [curr]: {
-          ...acc[curr],
-          // resolve conditional params
-          ...Object.keys(card_values[curr]).reduce((a, c) => {
-            const val = card_values[curr][c]
-            //console.log (`updateTabValues: looking for conditional value=${JSON.stringify(val)}`)
-            // if value is array with at least 1 element with a object that has a properly 'set'
-            const targetVal = Array.isArray(val) && val.length > 0 && typeof val[0] === 'object' && val[0].hasOwnProperty("set") ?
-              val.reduce((a, c) => a === undefined ? (c.page && c.field ? (currenttabValues[c.page][c.field] === c.value ? c.set : undefined) : c.set) : a, undefined)
-              :
-              val
-            //console.log(`updateTabValues: setting tab=${curr}, field=${c} val=${JSON.stringify(val)} targetVal=${JSON.stringify(targetVal)}`)
-            return { ...a, [c]: targetVal }
-          }, {})
-        }
-      }
-    }, currenttabValues)
-  }
-
-  function updateSelected(sectionKey, cardKey) {
-    //console.log("AI:- Card update fired " + sectionKey + " - " + cardKey)
-    appInsights.trackEvent({name: "Card." + sectionKey + "." + cardKey});
-    setUrlParams((currentUrlParams) => {
-      currentUrlParams.set(sectionKey, cardKey)
-      window.history.replaceState(null, null, "?"+currentUrlParams.toString())
-      return currentUrlParams
-    })
-
-    console.log(`updateSelected: sectionKey=${sectionKey} cardKey=${cardKey}`)
-    setSelected(currentSelected => {return { ...currentSelected, values: { ...selected.values, [sectionKey]: cardKey } }})
-    setTabValues(currentTabValues => updateTabValues(currentTabValues, sections, sectionKey, cardKey))
-  }
 
 
   useEffect(() => {
@@ -274,24 +171,6 @@ export default function PortalNav({ config }) {
 
   function _handleLinkClick(item) {
     setPivotkey(item.props.itemKey)
-  }
-
-  function presetChanged(preset) {
-    console.log(`presetChanged preset=${JSON.stringify(preset)}`)
-    // capture old selected cards to remove from the url
-    const oldSelectedCards = Object.keys(selected.values)
-    const newSelected = initSelected(preset)
-    setSelected(newSelected)
-
-    setTabValues(initTabValues(newSelected, {...defaults, deploy: tabValues.deploy}))
-    setUrlParams((currentUrlParams) => {
-      // remove old cards
-      for (const key of oldSelectedCards) currentUrlParams.delete(key)
-      // add new
-      currentUrlParams.set('preset', preset)
-      window.history.replaceState(null, null, "?"+currentUrlParams.toString())
-      return currentUrlParams
-    })
   }
 
   function mergeState(tab, field, value, previewLink) {
@@ -440,21 +319,16 @@ export default function PortalNav({ config }) {
   const { semanticColors, palette } = dark ? AzureThemeDark : AzureThemeLight
 
 
-  // The sections array within the selected preset, for example [{"key": "ops"...}, {"key": "secure"...}]
-  const { sections } = presets[selected.preset]
   const featureFlag = urlParams.getAll('feature')
 
   return (
     <ThemeProvider theme={{ semanticColors, palette }}>
+      <div style={{ backgroundColor: semanticColors.bodyBackground, minHeight: '100vh' }}>
       <main id="mainContent" className="wrapper">
       <PreviewDialog onClose={ ()=> setShow(false)} show={show} previewLink={previewLink}></PreviewDialog>
-        <Header presets={presets} selectedPreset={selected.preset} setPresets={presetChanged} featureFlag={featureFlag} />
+        <Header featureFlag={featureFlag} />
 
         <Stack verticalFill styles={{ root: { width: '960px', margin: '0 auto', color: 'grey' } }}>
-
-          <Presets description={description} icon={icon} sections={sections} selectedValues={selected.values} updateSelected={updateSelected} featureFlag={featureFlag} />
-
-          <Separator styles={SeparatorStyle}><span style={{ "color": "rgb(0, 103, 184)" }}>Fine tune & Deploy</span></Separator>
 
           <Pivot selectedKey={pivotkey} onLinkClick={_handleLinkClick} focusZoneProps={{ 'data-testid': `portalnav-Pivot` }}>
             <PivotItem headerText={tabLabels.deploy} itemKey="deploy" onRenderItemLink={(a, b) => _customRenderer('deploy', a, b)}>
@@ -469,14 +343,12 @@ export default function PortalNav({ config }) {
             <PivotItem headerText={tabLabels.net} itemKey="net" onRenderItemLink={(a, b) => _customRenderer('net', a, b)}>
               <NetworkTab defaults={defaults} tabValues={tabValues} featureFlag={featureFlag} updateFn={(field, value) => mergeState("net", field, value)} invalidArray={invalidArray['net']} />
             </PivotItem>
-            <PivotItem headerText={tabLabels.app} itemKey="app" onRenderItemLink={(a, b) => _customRenderer('app', a, b)}>
-              <AppsTab tabValues={tabValues} featureFlag={featureFlag} updateFn={(field, value) => mergeState("app", field, value)} invalidArray={invalidArray['app']} />
-            </PivotItem>
           </Pivot>
 
         </Stack>
 
       </main >
+      </div>
     </ThemeProvider>
   )
 }

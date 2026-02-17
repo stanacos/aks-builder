@@ -3,8 +3,8 @@ const { test, expect } = require('@playwright/test');
 // Tests verify that Cilium dataplane is GA (not a preview feature) (REQ-007).
 
 test('cilium-dataplane-not-listed-as-preview-feature', async ({ page }) => {
-  // Use secureLab preset which enables Cilium dataplane
-  await page.goto('http://localhost:3000/AKS-Construction?preset=secureLab');
+  // Use URL params to enable Cilium network policy
+  await page.goto('http://localhost:3000/AKS-Construction?addons.networkPolicy=cilium');
 
   // Click deploy tab (1st tab)
   await page.click('[data-testid="portalnav-Pivot"] > button:nth-child(1)');
@@ -21,7 +21,7 @@ test('cilium-dataplane-not-listed-as-preview-feature', async ({ page }) => {
 });
 
 test('cilium-dataplane-included-in-params-not-preview', async ({ page }) => {
-  // Start with lean preset (default), networkPlugin=azure and networkDataplane=true by default
+  // Config.json defaults have networkPlugin=azure and networkDataplane=true
   await page.goto('http://localhost:3000/AKS-Construction');
 
   // Click the network tab (4th tab)

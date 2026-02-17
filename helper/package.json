@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "/AKS-Construction/",
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@fluentui/azure-themes": "^8.6.139",
     "@fluentui/react": "^8.125.4",
     "@microsoft/applicationinsights-web": "^3.3.0",

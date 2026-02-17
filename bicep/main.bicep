@@ -921,7 +921,7 @@ var autoScale = agentCountMax > agentCount
 @minLength(3)
 @maxLength(12)
 @description('Name for user node pool')
-param nodePoolName string = 'userpool01'
+param nodePoolName string = 'userpool'
 
 @description('Config the user node pool as a spot instance')
 param nodePoolSpot bool = false
@@ -1160,7 +1160,7 @@ var systemPoolPresets = {
 }
 
 var systemPoolBase = {
-  name:  JustUseSystemPool ? nodePoolName : 'agentpool'
+  name:  JustUseSystemPool ? nodePoolName : 'systempool'
   vmSize: agentVMSize
   count: agentCount
   mode: 'System'
@@ -1182,7 +1182,7 @@ var systemPoolOsSku = { osSku: 'AzureLinux' }
 var agentPoolProfiles = JustUseSystemPool ? array(systemPoolBase) : concat(array(union(systemPoolBase, SystemPoolType=='Custom' && SystemPoolCustomPreset != {} ? SystemPoolCustomPreset : systemPoolPresets[SystemPoolType], systemPoolOsSku)))
 
 output userNodePoolName string = nodePoolName
-output systemNodePoolName string = JustUseSystemPool ? nodePoolName : 'agentpool'
+output systemNodePoolName string = JustUseSystemPool ? nodePoolName : 'systempool'
 
 var akssku = AksPaidSkuForSLA ? 'Standard' : 'Free'
 

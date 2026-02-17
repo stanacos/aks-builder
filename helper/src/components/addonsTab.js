@@ -393,6 +393,7 @@ export default function ({ tabValues, updateFn, featureFlag, invalidArray,showPr
                     selectedKey={addons.csisecret}
                     options={[
                         { key: 'none', text: 'No, I am happy to use the default Kubernetes secret storage, or I will configure my own solution' },
+                        { key: 'csiOnly', text: 'Yes, install the Secrets Store CSI Driver (no KeyVault)' },
                         { key: 'akvExist', text: 'Yes, store secrets in an existing KeyVault & enable Secrets Store CSI Driver' },
                         { key: 'akvNew', text: 'Yes, provision a new Azure KeyVault & enable Secrets Store CSI Driver' }
                     ]}
@@ -444,7 +445,7 @@ export default function ({ tabValues, updateFn, featureFlag, invalidArray,showPr
 
                 {addons.automationAccountScheduledStartStop !== '' &&
                 <Stack.Item align="center" styles={{ root: { marginLeft: '100px', width:'275px'}}}>
-                    <MessageBar>Only supports 'on the hour' schedules. 24 hour format, UTC Time zone.</MessageBar>
+                    <MessageBar>Only supports 'on the hour' schedules. 24 hour format. Timezone is configurable via the deployment parameters.</MessageBar>
 
                     <Dropdown
                         styles={{ root: { marginBottom: '20px' } }}

@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 
 test('default-outbound-option-is-natgateway', async ({ page }) => {
 
-  // The lean preset does not override aksOutboundTrafficType, so config.json default (natGateway) applies
+  // Config.json defaults have aksOutboundTrafficType=natGateway
   await page.goto('http://localhost:3000/AKS-Construction');
 
   // Click the 4th Tab in the portal Navigation Pivot (network)

@@ -1,8 +1,8 @@
 const { test, expect } = require('@playwright/test');
 
-test('ingress-options-test-lean-preset-no-ingress', async ({ page }) => {
+test('ingress-options-test-default-no-ingress', async ({ page }) => {
 
-  // The lean preset sets ingress to 'none'
+  // Config.json default sets ingress to 'none'
   await page.goto('http://localhost:3000/AKS-Construction');
 
   // Click the 3rd Tab in the portal Navigation Pivot (addons)

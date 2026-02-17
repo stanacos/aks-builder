@@ -33,7 +33,7 @@ export default function ({ defaults, tabValues, updateFn, featureFlag, invalidAr
             console.log (`maxCount=${newp.maxCount} MIN=${MAXCOUNT_MIN}`)
 
             if(newp.SystemPoolType!=='none' && !cluster.nodepoolName){
-                cluster.nodepoolName = 'userpool01'
+                cluster.nodepoolName = 'userpool'
             }
 
             if (newp.maxCount < MAXCOUNT_MIN) {
@@ -165,7 +165,7 @@ export default function ({ defaults, tabValues, updateFn, featureFlag, invalidAr
                         onChange={(val, range) => sliderUpdateFn(cluster.autoscale ? {agentCount: range[0], maxCount: range[1]} : {agentCount: val})} />
 
                         <TextField
-                        placeholder='userpool01'
+                        placeholder='userpool'
                         label="Node pool name"
                         maxLength={cluster.osType==='Windows' ? 6 : 12}
                         onChange={(ev, val) => updateFn('nodepoolName', val)}
@@ -231,7 +231,7 @@ export default function ({ defaults, tabValues, updateFn, featureFlag, invalidAr
                                 options={[
                                     {
                                         key: 'Ephemeral',
-                                        text: 'Ephemeral (Requires Node with >137GiB of cache)'
+                                        text: 'Ephemeral (Requires VM with local NVMe/temp storage, e.g. Dds_v6 series)'
                                     },
                                     {
                                         key: 'Managed',
